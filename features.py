@@ -23,8 +23,8 @@ class FeatureGenerator(Spectrum):
     def __init__(self, seccode):
         super().__init__(seccode)
 
-        self.VWAP_bid = {band: 0 for band in self.BAND_VALUES}
-        self.VWAP_ask = {band: 0 for band in self.BAND_VALUES}
+        self.VWAP_bid = { band: 0 for band in self.BAND_VALUES }
+        self.VWAP_ask = { band: 0 for band in self.BAND_VALUES }
 
     def normalize(self):
         """

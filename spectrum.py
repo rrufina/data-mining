@@ -63,7 +63,6 @@ class Spectrum:
                 for bid in order_book.bids.values():
                     self.change_bids(price=bid['PRICE'], volume=bid['VOLUME'], step=step, add=True)
 
-
             elif new_price == self.best_bid:
                 self.bids[9] += volume
 
@@ -136,6 +135,3 @@ class Spectrum:
     def update_match(self, order_book: OrderBook, new_price: float, volume: int, ask: bool):
 
         self.update_revoke(order_book, new_price, volume, ask)
-
-
-

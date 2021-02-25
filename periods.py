@@ -1,7 +1,7 @@
 from scipy.stats import kstest
 import numpy as np
 
-# class for storing time and count means of spectrums
+# class for storing count means of spectrums for different time periods
 class PdfPeriod:
     def __init__(self, seccode: str):
         seccode = seccode
@@ -20,6 +20,7 @@ class PdfPeriod:
             spectrum = [float(el) for el in spectrum_str[1:-1].split(',')]
             time_cur = timestamp//100000000
 
+            # define time period
             if   time_cur < 1500: per = 0
             elif time_cur < 1900: per = 1
             else:                 per = 2
@@ -28,7 +29,8 @@ class PdfPeriod:
                 self.bids[per][i] += spectrum[i]
                 self.asks[per][i] += spectrum[10 + i]
             total_count[per] += 1
-
+        
+        # calculate averages
         for i in range(3):
             self.bids[i] = self.bids[i]/total_count[i]
             self.asks[i] = self.asks[i]/total_count[i]
@@ -64,7 +66,7 @@ class PdfPeriod:
         else:
             return False
 
-    def perform_comparison(self, date: str):
+    def compare_by_periods(self, date: str):
         """
         compare bids and asks in different periods of time
         """
@@ -76,7 +78,7 @@ class PdfPeriod:
             result.append(answer)
         return result
     
-    def another_comp(self, entry, date: str):
+    def compare_by_days(self, entry, date: str):
         """
         compare bids and asks with the previous day
         """

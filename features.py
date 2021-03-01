@@ -1,6 +1,5 @@
 from orderbook import OrderBook
 from spectrum import Spectrum
-from utils import instruments_info
 
 
 class FeatureGenerator(Spectrum):

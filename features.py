@@ -67,7 +67,10 @@ class FeatureGenerator(Spectrum):
                            for band, VWAP_ask in self.VWAP_asks.items() }
 
     def update_bid_ask_spread(self):
-        self.bid_ask_spread = (self.best_bid - self.best_ask) / self.px_step
+        if self.best_bid == self.BEST_BID or self.best_ask == self.BEST_ASK:
+            self.bid_ask_spread = 0
+        else:
+            self.bid_ask_spread = (self.best_ask - self.best_bid) / self.px_step
 
     def update_VWAP_bids(self, order_book: OrderBook):
         # Reset VWAP bids before updating them

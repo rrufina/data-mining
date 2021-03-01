@@ -61,10 +61,10 @@ class PdfPeriod:
 
         pval = kstest(PdfPeriod._calc_cdf(pdf1),
                       PdfPeriod._calc_cdf(pdf2)).pvalue
-        if pval > 0.95:
-            return True
-        else:
+        if pval < (1-alpha):
             return False
+        else:
+            return True
 
     def compare_by_periods(self, date: str):
         """
@@ -72,8 +72,8 @@ class PdfPeriod:
         """
         result = [date]
         for i, j in [(0, 1),(1, 2),(0, 2)]:
-            comp_bids = PdfPeriod.kstest(self.bids[i], self.bids[j], 0.95)
-            comp_asks = PdfPeriod.kstest(self.asks[i], self.asks[j], 0.95)
+            comp_bids = PdfPeriod.kstest(self.bids[i], self.bids[j], 0.975)
+            comp_asks = PdfPeriod.kstest(self.asks[i], self.asks[j], 0.975)
             answer = str(comp_bids)+', '+str(comp_asks)
             result.append(answer)
         return result
@@ -84,8 +84,8 @@ class PdfPeriod:
         """
         result = [date]
         for i in range(3):
-            comp_bids = PdfPeriod.kstest(self.bids[i], entry[0][i], 0.95)
-            comp_asks = PdfPeriod.kstest(self.asks[i], entry[1][i], 0.95)
+            comp_bids = PdfPeriod.kstest(self.bids[i], entry[0][i], 0.975)
+            comp_asks = PdfPeriod.kstest(self.asks[i], entry[1][i], 0.975)
             answer = str(comp_bids)+', '+str(comp_asks)
             result.append(answer)
         return result

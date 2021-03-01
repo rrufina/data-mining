@@ -26,7 +26,7 @@ class FeatureGenerator(Spectrum):
         self.asks = [0] * 10
         self.bids_normalized = [0] * 10
         self.asks_normalized = [0] * 10
-
+        self.bid_ask_spread = 0
         self.VWAP_bids = { band: 0 for band in self.BAND_VALUES }
         self.VWAP_asks = { band: 0 for band in self.BAND_VALUES }
         self.VWAP_bids_normalized = { band: 0 for band in self.BAND_VALUES }
@@ -65,6 +65,9 @@ class FeatureGenerator(Spectrum):
 
         self.VWAP_asks_normalized = { band: (VWAP_ask - mid_px) / self.px_step
                            for band, VWAP_ask in self.VWAP_asks.items() }
+
+    def update_bid_ask_spread(self):
+        self.bid_ask_spread = (self.best_bid - self.best_ask) / self.px_step
 
     def update_VWAP_bids(self, order_book: OrderBook):
         # Reset VWAP bids before updating them
@@ -193,6 +196,7 @@ class FeatureGenerator(Spectrum):
 
             self.update_VWAP_asks(order_book)
 
+        self.update_bid_ask_spread()
         self.normalize()
         self.normalize_VWAPs()
 
@@ -244,5 +248,6 @@ class FeatureGenerator(Spectrum):
 
             self.update_VWAP_asks(order_book)
 
+        self.update_bid_ask_spread()
         self.normalize()
         self.normalize_VWAPs()

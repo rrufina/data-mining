@@ -6,7 +6,7 @@ from utils import instruments_info
 class Spectrum:
     def __init__(self, seccode):
         self.seccode = seccode
-        self.best_ask = 1e19
+        self.best_ask = int(1e19)
         self.best_bid = -1
         self.bids = [0] * 10
         self.asks = [0] * 10
@@ -114,14 +114,14 @@ class Spectrum:
             if new_price == self.best_ask:
                 if volume >= self.asks[0]:
 
-                    self.best_ask = 1e19
+                    self.best_ask = int(1e19)
 
                     for ask in order_book.asks.values():
                         if ask['PRICE'] < self.best_ask:
                             self.best_ask = ask['PRICE']
                             
                     self.asks = [0] * 10
-                    if 0 < self.best_ask < 1e19:
+                    if 0 < self.best_ask < int(1e19):
                         for ask in order_book.asks.values():
                             self.change_asks(price=ask['PRICE'], volume=ask['VOLUME'], step=step, add=True)
 

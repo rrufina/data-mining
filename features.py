@@ -178,13 +178,59 @@ class FeatureGenerator(Spectrum):
         if aggressors is None:
             return
 
-        pass
+        volume = 0
+        period_idx = 0
+        period = self.PERIODS[period_idx]
+        current_time = aggressors[-1]
+
+        # pair[0] is time, pair[1] is volume
+        for pair in reversed(aggressors[:-1]):
+
+            while current_time - pair[0] >= period:
+                self.aggressive_bids[period] = volume
+
+                try:
+                    period_idx += 1
+                    period = self.PERIODS[period_idx]
+                except IndexError:
+                    break
+            else:
+                volume += pair[1]
+
+        # Handle remaining pairs
+        if period_idx < len(self.PERIODS):
+            for p in self.PERIODS:
+                if p >= period:
+                    self.aggressive_bids[p] = volume
 
     def update_aggressive_asks(self, aggressors):
         if aggressors is None:
             return
 
-        pass
+        volume = 0
+        period_idx = 0
+        period = self.PERIODS[period_idx]
+        current_time = aggressors[-1]
+
+        # pair[0] is time, pair[1] is volume
+        for pair in reversed(aggressors[:-1]):
+
+            while current_time - pair[0] >= period:
+                self.aggressive_asks[period] = volume
+
+                try:
+                    period_idx += 1
+                    period = self.PERIODS[period_idx]
+                except IndexError:
+                    break
+            else:
+                volume += pair[1]
+
+        # Handle remaining pairs
+        if period_idx < len(self.PERIODS):
+            for p in self.PERIODS:
+                if p >= period:
+                    self.aggressive_asks[p] = volume
 
     def update_post(self, order_book: OrderBook, new_price: float, volume: int, ask: bool):
         step = self.px_step

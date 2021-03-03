@@ -174,6 +174,18 @@ class FeatureGenerator(Spectrum):
                 if b >= band:
                     self.VWAP_asks[b] = total / volume
 
+    def update_aggressive_bids(self, aggressors):
+        if aggressors is None:
+            return
+
+        pass
+
+    def update_aggressive_asks(self, aggressors):
+        if aggressors is None:
+            return
+
+        pass
+
     def update_post(self, order_book: OrderBook, new_price: float, volume: int, ask: bool):
         step = self.px_step
 
@@ -216,7 +228,7 @@ class FeatureGenerator(Spectrum):
         self.normalize_VWAPs()
         self.normalize_aggressors()
 
-    def update_revoke(self, order_book: OrderBook, new_price: float, volume: int, ask: bool):
+    def update_revoke(self, order_book: OrderBook, new_price: float, volume: int, ask: bool, aggressors=None):
         step = self.px_step
 
         if not ask:
@@ -238,6 +250,10 @@ class FeatureGenerator(Spectrum):
 
             elif new_price < self.best_bid:
                 self.change_bids(price=new_price, volume=volume, step=step, add=False)
+
+            else:
+                # Aggressor
+                self.update_aggressive_bids(aggressors)
 
             self.update_VWAP_bids(order_book)
 
@@ -262,9 +278,16 @@ class FeatureGenerator(Spectrum):
             elif new_price > self.best_ask:
                 self.change_asks(price=new_price, volume=volume, step=step, add=False)
 
+            else:
+                # Aggressor
+                self.update_aggressive_asks(aggressors)
+
             self.update_VWAP_asks(order_book)
 
         self.update_bid_ask_spread()
         self.normalize()
         self.normalize_VWAPs()
         self.normalize_aggressors()
+
+    def update_match(self, order_book: OrderBook, new_price: float, volume: int, ask: bool, aggressors=None):
+        self.update_revoke(order_book, new_price, volume, ask, aggressors)

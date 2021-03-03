@@ -217,9 +217,9 @@ class FeatureGenerator(Spectrum):
                             self.best_bid = bid['PRICE']
 
                     self.bids = [0] * 10
-
-                    for bid in order_book.bids.values():
-                        self.change_bids(price=bid['PRICE'], volume=bid['VOLUME'], step=step, add=True)
+                    if self.best_bid > 0:
+                        for bid in order_book.bids.values():
+                            self.change_bids(price=bid['PRICE'], volume=bid['VOLUME'], step=step, add=True)
                 else:
                     self.bids[9] -= volume
 
@@ -239,9 +239,9 @@ class FeatureGenerator(Spectrum):
                             self.best_ask = ask['PRICE']
 
                     self.asks = [0] * 10
-
-                    for ask in order_book.asks.values():
-                        self.change_asks(price=ask['PRICE'], volume=ask['VOLUME'], step=step, add=True)
+                    if 0 < self.best_ask < self.BEST_ASK:
+                        for ask in order_book.asks.values():
+                            self.change_asks(price=ask['PRICE'], volume=ask['VOLUME'], step=step, add=True)
 
                 else:
                     self.asks[0] -= volume

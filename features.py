@@ -7,7 +7,7 @@ class FeatureGenerator(Spectrum):
     BEST_BID = -1
     BEST_ASK = int(1E19)
 
-    MAX_BAND = 10 * 1E6
+    MAX_BAND = 10 * int(1E6)
 
     BAND_VALUES = list(map(int, [     1E5,
                                  2  * 1E5,
@@ -17,28 +17,33 @@ class FeatureGenerator(Spectrum):
                                  10 * 1E6]
                            ))
 
+    PERIODS = [1, 5, 15, 30, 60]
+
     def __init__(self, seccode, px_step):
         self.seccode = seccode
         self.px_step = px_step
+
         self.best_bid = self.BEST_BID
         self.best_ask = self.BEST_ASK
+
         self.bids = [0] * 10
         self.asks = [0] * 10
         self.bids_normalized = [0] * 10
         self.asks_normalized = [0] * 10
+
+        self.VWAP_bids = { band: 0 for band in self.BAND_VALUES }
+        self.VWAP_asks = { band: 0 for band in self.BAND_VALUES }
+        self.VWAP_bids_normalized = { band: 0 for band in self.BAND_VALUES }
+        self.VWAP_asks_normalized = { band: 0 for band in self.BAND_VALUES }
+
+        self.aggressive_bids = { period: 0 for period in self.PERIODS }
+        self.aggressive_asks = { period: 0 for period in self.PERIODS }
+        self.aggressive_bids_normalized_band = { period: 0 for period in self.PERIODS }
+        self.aggressive_asks_normalized_band = { period: 0 for period in self.PERIODS }
+        self.aggressive_bids_normalized_time = { period: 0 for period in self.PERIODS }
+        self.aggressive_asks_normalized_time = { period: 0 for period in self.PERIODS }
+
         self.bid_ask_spread = 0
-        self.VWAP_bids = { band: 0 for band in self.BAND_VALUES }
-        self.VWAP_asks = { band: 0 for band in self.BAND_VALUES }
-        self.VWAP_bids_normalized = { band: 0 for band in self.BAND_VALUES }
-        self.VWAP_asks_normalized = { band: 0 for band in self.BAND_VALUES }
-
-    def reset_VWAP_bids(self):
-        self.VWAP_bids = { band: 0 for band in self.BAND_VALUES }
-        self.VWAP_bids_normalized = { band: 0 for band in self.BAND_VALUES }
-
-    def reset_VWAP_asks(self):
-        self.VWAP_asks = { band: 0 for band in self.BAND_VALUES }
-        self.VWAP_asks_normalized = { band: 0 for band in self.BAND_VALUES }
 
     def normalize(self):
         """
@@ -66,6 +71,19 @@ class FeatureGenerator(Spectrum):
         self.VWAP_asks_normalized = { band: (VWAP_ask - mid_px) / self.px_step
                            for band, VWAP_ask in self.VWAP_asks.items() }
 
+    def normalize_aggressors(self):
+        self.aggressive_bids_normalized_band = { period: volume / self.MAX_BAND
+                                                 for period, volume in self.aggressive_bids.items() }
+
+        self.aggressive_asks_normalized_band = { period: volume / self.MAX_BAND
+                                                 for period, volume in self.aggressive_asks.items() }
+
+        self.aggressive_bids_normalized_time = { period: volume / period
+                                                 for period, volume in self.aggressive_bids.items() }
+
+        self.aggressive_asks_normalized_time = { period: volume / period
+                                                 for period, volume in self.aggressive_asks.items() }
+
     def update_bid_ask_spread(self):
         if self.best_bid == self.BEST_BID or self.best_ask == self.BEST_ASK:
             self.bid_ask_spread = 0
@@ -73,9 +91,6 @@ class FeatureGenerator(Spectrum):
             self.bid_ask_spread = (self.best_ask - self.best_bid) / self.px_step
 
     def update_VWAP_bids(self, order_book: OrderBook):
-        # Reset VWAP bids before updating them
-        self.reset_VWAP_bids()
-
         # Handle empty bids
         if not order_book.bids:
             return
@@ -118,9 +133,6 @@ class FeatureGenerator(Spectrum):
                     self.VWAP_bids[b] = total / volume
 
     def update_VWAP_asks(self, order_book: OrderBook):
-        # Reset VWAP asks before updating them
-        self.reset_VWAP_asks()
-
         # Handle empty asks
         if not order_book.asks:
             return
@@ -202,6 +214,7 @@ class FeatureGenerator(Spectrum):
         self.update_bid_ask_spread()
         self.normalize()
         self.normalize_VWAPs()
+        self.normalize_aggressors()
 
     def update_revoke(self, order_book: OrderBook, new_price: float, volume: int, ask: bool):
         step = self.px_step
@@ -254,3 +267,4 @@ class FeatureGenerator(Spectrum):
         self.update_bid_ask_spread()
         self.normalize()
         self.normalize_VWAPs()
+        self.normalize_aggressors()

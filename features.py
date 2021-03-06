@@ -271,7 +271,7 @@ class FeatureGenerator(Spectrum):
 
         # pair[0] is time, pair[1] is volume, pair[2] is price
         for pair in reversed(bids_makers[:-1]):
-            if pair[2] > self.best_bid - 4 * self.px_step:
+            if pair[2] < self.best_bid - 4 * self.px_step:
                 continue
 
             while current_time - pair[0] >= period:
@@ -302,7 +302,7 @@ class FeatureGenerator(Spectrum):
 
         # triple[0] is time, triple[1] is volume, triple[2] is price
         for triple in reversed(asks_makers[:-1]):
-            if triple[2] < self.best_ask + 4 * self.px_step:
+            if triple[2] > self.best_ask + 4 * self.px_step:
                 continue
 
             while current_time - triple[0] >= period:

@@ -261,7 +261,35 @@ class FeatureGenerator(Spectrum):
         self.update_asks_makers(asks_makers)
 
     def update_bids_makers(self, bids_makers):
-        pass
+        if bids_makers is None:
+            return
+
+        volume = 0
+        period_idx = 0
+        period = self.PERIODS[period_idx]
+        current_time = bids_makers[-1][0]
+
+        # pair[0] is time, pair[1] is volume, pair[2] is price
+        for pair in reversed(bids_makers[:-1]):
+            if pair[2] > self.best_bid - 4 * self.px_step:
+                continue
+
+            while current_time - pair[0] >= period:
+                self.bids_makers[period] = volume
+
+                try:
+                    period_idx += 1
+                    period = self.PERIODS[period_idx]
+                except IndexError:
+                    break
+            else:
+                volume += pair[1]
+
+        # Handle remaining triple
+        if period_idx < len(self.PERIODS):
+            for p in self.PERIODS:
+                if p >= period:
+                    self.bids_makers[p] = volume
 
     def update_asks_makers(self, asks_makers):
         if asks_makers is None:

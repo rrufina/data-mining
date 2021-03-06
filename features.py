@@ -43,6 +43,13 @@ class FeatureGenerator(Spectrum):
         self.aggressive_bids_normalized_time = { period: 0 for period in self.PERIODS }
         self.aggressive_asks_normalized_time = { period: 0 for period in self.PERIODS }
 
+        self.bids_makers = {period: 0 for period in self.PERIODS}
+        self.asks_makers = {period: 0 for period in self.PERIODS}
+        self.bids_makers_normalized_band = {period: 0 for period in self.PERIODS}
+        self.asks_makers_normalized_band = {period: 0 for period in self.PERIODS}
+        self.bids_makers_normalized_time = {period: 0 for period in self.PERIODS}
+        self.asks_makers_normalized_time = {period: 0 for period in self.PERIODS}
+
         self.bid_ask_spread = 0
 
     def normalize(self):
@@ -83,6 +90,19 @@ class FeatureGenerator(Spectrum):
 
         self.aggressive_asks_normalized_time = { period: volume / period
                                                  for period, volume in self.aggressive_asks.items() }
+
+    def normalize_makers(self):
+        self.bids_makers_normalized_band = { period: volume / self.MAX_BAND
+                                                 for period, volume in self.bids_makers.items() }
+
+        self.asks_makers_normalized_band = { period: volume / self.MAX_BAND
+                                                 for period, volume in self.asks_makers.items() }
+
+        self.bids_makers_normalized_time = { period: volume / period
+                                                 for period, volume in self.bids_makers.items() }
+
+        self.asks_makers_normalized_time = { period: volume / period
+                                                 for period, volume in self.asks_makers.items() }
 
     def update_bid_ask_spread(self):
         if self.best_bid == self.BEST_BID or self.best_ask == self.BEST_ASK:
@@ -174,11 +194,11 @@ class FeatureGenerator(Spectrum):
                 if b >= band:
                     self.VWAP_asks[b] = total / volume
 
-    def update_aggressive(self, aggressive_bids=None, aggressive_asks=None, makers_flag=False):
-        self.update_aggressive_bids(aggressive_bids, makers_flag)
-        self.update_aggressive_asks(aggressive_asks, makers_flag)
+    def update_aggressive(self, aggressive_bids=None, aggressive_asks=None):
+        self.update_aggressive_bids(aggressive_bids)
+        self.update_aggressive_asks(aggressive_asks)
 
-    def update_aggressive_bids(self, aggressors, makers_flag):
+    def update_aggressive_bids(self, aggressors):
         if aggressors is None:
             return
 
@@ -236,6 +256,16 @@ class FeatureGenerator(Spectrum):
                 if p >= period:
                     self.aggressive_asks[p] = volume
 
+    def update_makers(self, bids_makers=None, asks_makers=None):
+        self.update_bids_makers(bids_makers)
+        self.update_asks_makers(asks_makers)
+
+    def update_bids_makers(self, bids_makers):
+        pass
+
+    def update_asks_makers(self, asks_makers):
+        pass
+
     def update_post(self, order_book: OrderBook, new_price: float, volume: int, ask: bool, aggressive_bids=None, aggressive_asks=None):
         step = self.px_step
 
@@ -273,11 +303,12 @@ class FeatureGenerator(Spectrum):
 
             self.update_VWAP_asks(order_book)
 
-        self.update_aggressive(aggressive_bids, aggressive_asks, True)
+        self.update_aggressive(aggressive_bids, aggressive_asks)
         self.update_bid_ask_spread()
         self.normalize()
         self.normalize_VWAPs()
         self.normalize_aggressors()
+        self.normalize_makers()
 
     def update_revoke(self, order_book: OrderBook, new_price: float, volume: int, ask: bool, aggressive_bids=None, aggressive_asks=None):
         step = self.px_step

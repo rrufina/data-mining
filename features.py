@@ -264,7 +264,35 @@ class FeatureGenerator(Spectrum):
         pass
 
     def update_asks_makers(self, asks_makers):
-        pass
+        if asks_makers is None:
+            return
+
+        volume = 0
+        period_idx = 0
+        period = self.PERIODS[period_idx]
+        current_time = asks_makers[-1][0]
+
+        # triple[0] is time, triple[1] is volume, triple[2] is price
+        for triple in reversed(asks_makers[:-1]):
+            if triple[2] < self.best_ask + 4 * self.px_step:
+                continue
+
+            while current_time - triple[0] >= period:
+                self.asks_makers[period] = volume
+
+                try:
+                    period_idx += 1
+                    period = self.PERIODS[period_idx]
+                except IndexError:
+                    break
+            else:
+                volume += triple[1]
+
+        # Handle remaining pairs
+        if period_idx < len(self.PERIODS):
+            for p in self.PERIODS:
+                if p >= period:
+                    self.asks_makers[p] = volume
 
     def update_post(self, order_book: OrderBook, new_price: float, volume: int, ask: bool,
                     aggressive_bids=None, aggressive_asks=None,

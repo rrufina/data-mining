@@ -174,11 +174,11 @@ class FeatureGenerator(Spectrum):
                 if b >= band:
                     self.VWAP_asks[b] = total / volume
 
-    def update_aggressive(self, aggressive_bids=None, aggressive_asks=None):
-        self.update_aggressive_bids(aggressive_bids)
-        self.update_aggressive_asks(aggressive_asks)
+    def update_aggressive(self, aggressive_bids=None, aggressive_asks=None, makers_flag=False):
+        self.update_aggressive_bids(aggressive_bids, makers_flag)
+        self.update_aggressive_asks(aggressive_asks, makers_flag)
 
-    def update_aggressive_bids(self, aggressors):
+    def update_aggressive_bids(self, aggressors, makers_flag):
         if aggressors is None:
             return
 
@@ -207,7 +207,7 @@ class FeatureGenerator(Spectrum):
                 if p >= period:
                     self.aggressive_bids[p] = volume
 
-    def update_aggressive_asks(self, aggressors):
+    def update_aggressive_asks(self, aggressors, makers_flag):
         if aggressors is None:
             return
 
@@ -273,7 +273,7 @@ class FeatureGenerator(Spectrum):
 
             self.update_VWAP_asks(order_book)
 
-        self.update_aggressive(aggressive_bids, aggressive_asks)
+        self.update_aggressive(aggressive_bids, aggressive_asks, True)
         self.update_bid_ask_spread()
         self.normalize()
         self.normalize_VWAPs()

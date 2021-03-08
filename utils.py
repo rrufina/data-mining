@@ -10,13 +10,19 @@ class Action:
 
 SECCODES = ['USD000000TOD', 'USD000UTSTOM', 'EUR_RUB__TOD', 'EUR_RUB__TOM', 'EURUSD000TOD', 'EURUSD000TOM']
 
+feature_seccodes = [
+    'USD000000TOD',
+    'USD000UTSTOM',
+    'EUR_RUB__TOD',
+    'EUR_RUB__TOM'
+]
+
 instruments_info = {'USD000000TOD': {'SCHEDULE': 174500000000, 'PRICE_STEP': 0.0025, 'INDEX': 0},
                     'USD000UTSTOM': {'SCHEDULE': 235000000000, 'PRICE_STEP': 0.0025, 'INDEX': 1},
                     'EUR_RUB__TOD': {'SCHEDULE': 150000000000, 'PRICE_STEP': 0.0025, 'INDEX': 2},
                     'EUR_RUB__TOM': {'SCHEDULE': 235000000000, 'PRICE_STEP': 0.0025, 'INDEX': 3},
                     'EURUSD000TOM': {'SCHEDULE': 235000000000, 'PRICE_STEP': 0.00001, 'INDEX': 4},
                     'EURUSD000TOD': {'SCHEDULE': 150000000000, 'PRICE_STEP': 0.00001, 'INDEX': 5}}
-
 
 def read_orderlog(orderlog_path: str) -> list:
     """

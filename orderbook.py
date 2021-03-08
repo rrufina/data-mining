@@ -85,4 +85,3 @@ class OrderBook:
         # discuss with leva and ruphina
         # for one order match is the same as revoke
         self.revoke(orderno=orderno, volume=volume, ask=ask, row_numb=row_numb)
-

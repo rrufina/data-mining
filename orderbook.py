@@ -5,9 +5,35 @@ class OrderBook:
         self.seccode = seccode
         self.asks = dict()
         self.bids = dict()
+        self.sorted_asks_list = []
+        self.sorted_bids_list = []
 
     def __repr__(self):
         return self.seccode
+    
+    def _do_sorting(self, dic, to_reverse=False):
+        temp_list = sorted(dic.values(), key=lambda item: item['PRICE'], reverse=to_reverse)
+        cur_price = temp_list[0]['PRICE'] if temp_list else -1
+        cur_volume = temp_list[0]['VOLUME'] if temp_list else -1
+        sorted_list = []
+        for index, item in enumerate(temp_list[1:]):
+            if item['PRICE'] != cur_price:
+                sorted_list.append((cur_price, cur_volume))
+                cur_price = item['PRICE']
+                cur_volume = item['VOLUME']
+            else:
+                cur_volume += item['VOLUME']
+
+        if cur_price > -1:
+            sorted_list.append((cur_price, cur_volume))
+            
+        return sorted_list
+    
+    
+    def sort_bids_and_asks(self):
+        self.sorted_asks_list = self._do_sorting(self.asks)
+        self.sorted_bids_list = self._do_sorting(self.bids, True)    
+        
 
     @staticmethod
     def print_error(error: str, row_numb: int) -> None:

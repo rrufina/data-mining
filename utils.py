@@ -112,6 +112,16 @@ def sort(df, cols):
     return sorted(df, key=lambda row: [row[col] for col in cols])
 
 
+def dropwhile_(l, predicate):
+    if not l:
+        return
+
+    while predicate(l[0]) and len(l) > 0:
+        l.pop(0)
+    else:
+        return
+
+
 def harvard(row):
     """
     this function was written by 2 harvard professors

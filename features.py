@@ -122,8 +122,8 @@ class FeatureGenerator(Spectrum):
         band = self.BAND_VALUES[band_idx]
 
         # Iterate through bids
-        for bid in order_book.bids.values():
-            current_volume = bid['VOLUME']
+        for bid in order_book._do_sorting(order_book.bids, True):
+            current_volume = bid[1]
 
             # Update band if new volume is greater than current band
             while volume + current_volume >= band:
@@ -131,7 +131,7 @@ class FeatureGenerator(Spectrum):
                 current_volume = volume + current_volume - band
 
                 # Update VWAP
-                total += bid['PRICE'] * (band - volume)
+                total += bid[0] * (band - volume)
                 volume = band
                 self.VWAP_bids[band] = total / band
 
@@ -143,7 +143,7 @@ class FeatureGenerator(Spectrum):
                     break
             else:
                 # Update total price and covered volume
-                total += bid['PRICE'] * current_volume
+                total += bid[0] * current_volume
                 volume += current_volume
 
         # Handle remaining bands
@@ -164,8 +164,8 @@ class FeatureGenerator(Spectrum):
         band = self.BAND_VALUES[band_idx]
 
         # Iterate through asks
-        for bid in order_book.asks.values():
-            current_volume = bid['VOLUME']
+        for ask in order_book._do_sorting(order_book.asks):
+            current_volume = ask[1]
 
             # Update band if new volume is greater than current band
             while volume + current_volume >= band:
@@ -173,7 +173,7 @@ class FeatureGenerator(Spectrum):
                 current_volume = volume + current_volume - band
 
                 # Update VWAP
-                total += bid['PRICE'] * (band - volume)
+                total += ask[0] * (band - volume)
                 volume = band
                 self.VWAP_asks[band] = total / band
 
@@ -185,7 +185,7 @@ class FeatureGenerator(Spectrum):
                     break
             else:
                 # Update total price and covered volume
-                total += bid['PRICE'] * current_volume
+                total += ask[0] * current_volume
                 volume += current_volume
 
         # Handle remaining bands
